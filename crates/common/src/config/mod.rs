@@ -70,7 +70,6 @@ impl Core {
             })
             .unwrap_or_default();
 
-        #[cfg(not(feature = "enterprise"))]
         let is_enterprise = false;
 
         let mut blob = config
@@ -168,8 +167,6 @@ impl Core {
         }
 
         Self {
-            #[cfg(feature = "enterprise")]
-            enterprise,
             sieve: Scripting::parse(config, &stores).await,
             network: Network::parse(config),
             smtp: SmtpConfig::parse(config).await,

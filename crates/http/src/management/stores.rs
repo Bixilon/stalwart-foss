@@ -30,8 +30,6 @@ use utils::url_params::UrlParams;
 
 use http_proto::{request::decode_path_element, *};
 
-#[cfg(feature = "enterprise")]
-use super::enterprise::undelete::UndeleteApi;
 use std::future::Future;
 
 pub trait ManageStore: Sync + Send {

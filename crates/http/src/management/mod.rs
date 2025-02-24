@@ -7,8 +7,6 @@
 pub mod crypto;
 pub mod dkim;
 pub mod dns;
-#[cfg(feature = "enterprise")]
-pub mod enterprise;
 pub mod log;
 pub mod principal;
 pub mod queue;
@@ -26,8 +24,6 @@ use crypto::CryptoHandler;
 use directory::{Permission, backend::internal::manage};
 use dkim::DkimManagement;
 use dns::DnsManagement;
-#[cfg(feature = "enterprise")]
-use enterprise::telemetry::TelemetryApi;
 use hyper::{Method, StatusCode, header};
 use jmap::api::{ToJmapHttpResponse, ToRequestError};
 use jmap_proto::error::request::RequestError;

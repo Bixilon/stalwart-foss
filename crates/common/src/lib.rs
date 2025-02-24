@@ -51,8 +51,6 @@ pub mod auth;
 pub mod config;
 pub mod core;
 pub mod dns;
-#[cfg(feature = "enterprise")]
-pub mod enterprise;
 pub mod expr;
 pub mod i18n;
 pub mod ipc;
@@ -330,8 +328,6 @@ pub struct Core {
     pub spam: SpamFilterConfig,
     pub imap: ImapConfig,
     pub metrics: Metrics,
-    #[cfg(feature = "enterprise")]
-    pub enterprise: Option<enterprise::Enterprise>,
 }
 
 impl<T: CacheItemWeight> CacheItemWeight for CacheSwap<T> {
