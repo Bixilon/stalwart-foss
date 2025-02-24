@@ -347,15 +347,6 @@ impl PrincipalSet {
     pub fn quota(&self) -> u64 {
         self.get_int(PrincipalField::Quota).unwrap_or_default()
     }
-
-    // SPDX-SnippetBegin
-    // SPDX-FileCopyrightText: 2020 Stalwart Labs LLC <hello@stalw.art>
-    // SPDX-License-Identifier: LicenseRef-SEL
-    pub fn tenant(&self) -> Option<u32> {
-        self.get_int(PrincipalField::Tenant).map(|v| v as u32)
-    }
-    // SPDX-SnippetEnd
-
     pub fn description(&self) -> Option<&str> {
         self.get_str(PrincipalField::Description)
     }
@@ -1413,67 +1404,4 @@ impl Permission {
                 | Permission::CalendarSchedulingReceive
         )
     }
-
-    // SPDX-SnippetBegin
-    // SPDX-FileCopyrightText: 2020 Stalwart Labs LLC <hello@stalw.art>
-    // SPDX-License-Identifier: LicenseRef-SEL
-
-    pub const fn is_tenant_admin_permission(&self) -> bool {
-        matches!(
-            self,
-            Permission::MessageQueueList
-                | Permission::MessageQueueGet
-                | Permission::MessageQueueUpdate
-                | Permission::MessageQueueDelete
-                | Permission::OutgoingReportList
-                | Permission::OutgoingReportGet
-                | Permission::OutgoingReportDelete
-                | Permission::IncomingReportList
-                | Permission::IncomingReportGet
-                | Permission::IncomingReportDelete
-                | Permission::IndividualList
-                | Permission::IndividualGet
-                | Permission::IndividualUpdate
-                | Permission::IndividualDelete
-                | Permission::IndividualCreate
-                | Permission::GroupList
-                | Permission::GroupGet
-                | Permission::GroupUpdate
-                | Permission::GroupDelete
-                | Permission::GroupCreate
-                | Permission::DomainList
-                | Permission::DomainGet
-                | Permission::DomainCreate
-                | Permission::DomainUpdate
-                | Permission::DomainDelete
-                | Permission::MailingListList
-                | Permission::MailingListGet
-                | Permission::MailingListCreate
-                | Permission::MailingListUpdate
-                | Permission::MailingListDelete
-                | Permission::RoleList
-                | Permission::RoleGet
-                | Permission::RoleCreate
-                | Permission::RoleUpdate
-                | Permission::RoleDelete
-                | Permission::PrincipalList
-                | Permission::PrincipalGet
-                | Permission::PrincipalCreate
-                | Permission::PrincipalUpdate
-                | Permission::PrincipalDelete
-                | Permission::Undelete
-                | Permission::DkimSignatureCreate
-                | Permission::DkimSignatureGet
-                | Permission::JmapPrincipalGet
-                | Permission::JmapPrincipalQueryChanges
-                | Permission::JmapPrincipalQuery
-                | Permission::ApiKeyList
-                | Permission::ApiKeyGet
-                | Permission::ApiKeyCreate
-                | Permission::ApiKeyUpdate
-                | Permission::ApiKeyDelete
-        ) || self.is_user_permission()
-    }
-
-    // SPDX-SnippetEnd
 }
