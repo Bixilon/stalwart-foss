@@ -49,8 +49,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_set(&kv.key, &kv.value, kv.expires).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.key_set(kv).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -97,8 +95,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_incr(&kv.key, kv.value, kv.expires).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.counter_incr(kv).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -118,8 +114,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_delete(key.into().as_bytes()).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.key_delete(key).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -139,8 +133,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_delete(key.into().as_bytes()).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.counter_delete(key).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -180,8 +172,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_delete_prefix(prefix).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.key_delete_prefix(prefix).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -202,8 +192,6 @@ impl InMemoryStore {
                 .map(|value| value.and_then(|v| v.into())),
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_get(key.into().as_bytes()).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.key_get(key).await,
             InMemoryStore::Static(store) => Ok(store
                 .get(key.into().as_str())
                 .map(|value| T::from(value.clone()))),
@@ -225,8 +213,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.counter_get(key.into().as_bytes()).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.counter_get(key).await,
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -244,8 +230,6 @@ impl InMemoryStore {
                 .map(|value| matches!(value, Some(LookupValue::Value(())))),
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(store) => store.key_exists(key.into().as_bytes()).await,
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store.key_exists(key).await,
             InMemoryStore::Static(store) => Ok(store.get(key.into().as_str()).is_some()),
             InMemoryStore::Http(store) => Ok(store.contains(key.into().as_str())),
         }
@@ -345,11 +329,6 @@ impl InMemoryStore {
                 .key_incr(&KeyValue::<()>::build_key(prefix, key), 1, duration.into())
                 .await
                 .map(|count| count == 1),
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(store) => store
-                .counter_incr(KeyValue::with_prefix(prefix, key, 1).expires(duration))
-                .await
-                .map(|count| count == 1),
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {
                 Err(trc::StoreEvent::NotSupported.into_err())
             }
@@ -443,8 +422,6 @@ impl InMemoryStore {
             }
             #[cfg(feature = "redis")]
             InMemoryStore::Redis(_) => {}
-            #[cfg(feature = "enterprise")]
-            InMemoryStore::Sharded(_) => {}
             InMemoryStore::Static(_) | InMemoryStore::Http(_) => {}
         }
 

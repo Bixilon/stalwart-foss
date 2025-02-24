@@ -40,7 +40,7 @@ tokio = { version = "1.45", features = ["full"] }
 jemallocator = "0.5.0"
 
 [features]
-#default = ["sqlite", "postgres", "mysql", "rocks", "elastic", "s3", "redis", "azure", "nats", "enterprise"]
+#default = ["sqlite", "postgres", "mysql", "rocks", "elastic", "s3", "redis", "azure", "nats"]
 default = ["rocks"]
 sqlite = ["store/sqlite"]
 foundationdb = ["store/foundation", "common/foundation"]

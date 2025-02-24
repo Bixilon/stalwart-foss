@@ -47,10 +47,6 @@ async fn main() -> std::io::Result<()> {
     init.config.log_errors();
     init.config.log_warnings();
 
-    // Log licensing information
-    #[cfg(feature = "enterprise")]
-    init.inner.build_server().log_license_details();
-
     // Spawn servers
     let (shutdown_tx, shutdown_rx) = init.servers.spawn(|server, acceptor, shutdown_rx| {
         match &server.protocol {
