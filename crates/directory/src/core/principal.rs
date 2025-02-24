@@ -352,6 +352,10 @@ impl PrincipalSet {
         self.get_str(PrincipalField::Description)
     }
 
+    pub fn tenant(&self) -> Option<u32> {
+        None
+    }
+
     pub fn get_str(&self, key: PrincipalField) -> Option<&str> {
         self.fields.get(&key).and_then(|v| v.as_str())
     }
