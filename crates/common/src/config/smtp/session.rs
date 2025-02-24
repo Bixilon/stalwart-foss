@@ -643,7 +643,7 @@ impl Default for SessionConfig {
                 greeting: IfBlock::new::<()>(
                     "session.connect.greeting",
                     [],
-                    "config_get('server.hostname') + ' Stalwart ESMTP at your service'",
+                    "config_get('server.hostname') + ' Stalwart-FOSS ESMTP at your service'",
                 ),
             },
             ehlo: Ehlo {
