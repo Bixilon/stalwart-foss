@@ -10,13 +10,7 @@ use common::{
     Core,
     auth::AccessToken,
     config::spamfilter::SpamFilterAction,
-    enterprise::{
-        SpamFilterLlmConfig,
-        llm::{
-            AiApiConfig, ChatCompletionChoice, ChatCompletionRequest, ChatCompletionResponse,
-            Message,
-        },
-    },
+    Core,
 };
 
 use compact_str::{CompactString, ToCompactString};
@@ -34,7 +28,7 @@ use spam_filter::{
         bayes::SpamFilterAnalyzeBayes, date::SpamFilterAnalyzeDate, dmarc::SpamFilterAnalyzeDmarc,
         domain::SpamFilterAnalyzeDomain, ehlo::SpamFilterAnalyzeEhlo, from::SpamFilterAnalyzeFrom,
         headers::SpamFilterAnalyzeHeaders, html::SpamFilterAnalyzeHtml, init::SpamFilterInit,
-        ip::SpamFilterAnalyzeIp, llm::SpamFilterAnalyzeLlm, messageid::SpamFilterAnalyzeMid,
+        ip::SpamFilterAnalyzeIp, messageid::SpamFilterAnalyzeMid,
         mime::SpamFilterAnalyzeMime, pyzor::SpamFilterAnalyzePyzor,
         received::SpamFilterAnalyzeReceived, recipient::SpamFilterAnalyzeRecipient,
         replyto::SpamFilterAnalyzeReplyTo, reputation::SpamFilterAnalyzeReputation,
@@ -49,7 +43,6 @@ use utils::config::Config;
 
 use crate::{
     http_server::{HttpMessage, spawn_mock_http_server},
-    jmap::enterprise::EnterpriseCore,
     smtp::{DnsCache, TempDir, TestSMTP, session::TestSession},
 };
 
@@ -207,14 +200,7 @@ async fn antispam() {
     config.resolve_all_macros().await;
     let stores = Stores::parse_all(&mut config, false).await;
     let mut core = Core::parse(&mut config, stores, Default::default())
-        .await
-        .enable_enterprise();
-    let ai_apis = AHashMap::from_iter([(
-        "dummy".to_string(),
-        AiApiConfig::parse(&mut config, "dummy").unwrap().into(),
-    )]);
-    core.enterprise.as_mut().unwrap().spam_filter_llm =
-        SpamFilterLlmConfig::parse(&mut config, &ai_apis);
+        .await;
     crate::AssertConfig::assert_no_errors(config);
     let server = TestSMTP::from_core(core).server;
 
@@ -277,34 +263,6 @@ async fn antispam() {
             Instant::now() + Duration::from_secs(100),
         );
     }
-
-    // Spawn mock OpenAI server
-    let _tx = spawn_mock_http_server(Arc::new(|req: HttpMessage| {
-        assert_eq!(req.uri.path(), "/v1/chat/completions");
-        assert_eq!(req.method, Method::POST);
-        let req =
-            serde_json::from_slice::<ChatCompletionRequest>(req.body.as_ref().unwrap()).unwrap();
-        assert_eq!(req.model, "gpt-dummy");
-        let message = &req.messages[0].content;
-        assert!(message.contains("You are an AI assistant specialized in analyzing email"));
-
-        JsonResponse::new(&ChatCompletionResponse {
-            created: 0,
-            object: String::new(),
-            id: String::new(),
-            model: req.model,
-            choices: vec![ChatCompletionChoice {
-                index: 0,
-                finish_reason: "stop".to_string(),
-                message: Message {
-                    role: "assistant".to_string(),
-                    content: message.split_once("Subject: ").unwrap().1.to_string(),
-                },
-            }],
-        })
-        .into_http_response()
-    }))
-    .await;
 
     // Run tests
     let base_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -669,9 +627,6 @@ async fn antispam() {
                 }
                 "pyzor" => {
                     server.spam_filter_analyze_pyzor(&mut spam_ctx).await;
-                }
-                "llm" => {
-                    server.spam_filter_analyze_llm(&mut spam_ctx).await;
                 }
                 _ => panic!("Invalid test {test_name:?}"),
             }
