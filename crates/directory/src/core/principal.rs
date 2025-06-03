@@ -72,13 +72,6 @@ impl Principal {
             })
     }
 
-    // SPDX-SnippetBegin
-    // SPDX-FileCopyrightText: 2020 Stalwart Labs Ltd <hello@stalw.art>
-    // SPDX-License-Identifier: LicenseRef-SEL
-    pub fn tenant(&self) -> Option<u32> {
-        self.tenant
-    }
-    // SPDX-SnippetEnd
 
     pub fn description(&self) -> Option<&str> {
         self.description.as_deref()

@@ -271,60 +271,6 @@ impl ManageDirectory for Store {
 
         let mut principal_create = Principal::new(0, principal_set.typ());
 
-        // SPDX-SnippetBegin
-        // SPDX-FileCopyrightText: 2020 Stalwart Labs Ltd <hello@stalw.art>
-        // SPDX-License-Identifier: LicenseRef-SEL
-
-        // Obtain tenant id, only if no default tenant is provided
-        #[cfg(feature = "enterprise")]
-        if let (Some(tenant_name), None) =
-            (principal_set.take_str(PrincipalField::Tenant), tenant_id)
-        {
-            tenant_id = self
-                .get_principal_info(&tenant_name)
-                .await
-                .caused_by(trc::location!())?
-                .filter(|v| v.typ == Type::Tenant)
-                .ok_or_else(|| not_found(tenant_name.clone()))?
-                .id
-                .into();
-        }
-
-        // Tenants must provide principal names including a valid domain
-        #[cfg(feature = "enterprise")]
-        if let Some(tenant_id) = tenant_id {
-            if matches!(principal_set.typ, Type::Tenant) {
-                return Err(error(
-                    "Invalid field",
-                    "Tenants cannot contain a tenant field".into(),
-                ));
-            }
-
-            principal_create.tenant = tenant_id.into();
-
-            if !matches!(principal_create.typ, Type::Tenant | Type::Domain) {
-                if let Some(domain) = name.split('@').nth(1) {
-                    if self
-                        .get_principal_info(domain)
-                        .await
-                        .caused_by(trc::location!())?
-                        .filter(|v| v.typ == Type::Domain && v.has_tenant_access(tenant_id.into()))
-                        .is_some()
-                    {
-                        valid_domains.insert(domain.into());
-                    }
-                }
-
-                if valid_domains.is_empty() {
-                    return Err(error(
-                        "Invalid principal name",
-                        "Principal name must include a valid domain assigned to the tenant".into(),
-                    ));
-                }
-            }
-        }
-        // SPDX-SnippetEnd
-
         // Set fields
         principal_create.name = name;
         principal_create.description = principal_set.take_str(PrincipalField::Description);
