@@ -536,7 +536,6 @@ impl Patterns {
                 Pattern::Include(MatchType::Equal("storage.lookup".to_string())),
                 Pattern::Include(MatchType::Equal("storage.fts".to_string())),
                 Pattern::Include(MatchType::Equal("storage.directory".to_string())),
-                Pattern::Include(MatchType::Equal("enterprise.license-key".to_string())),
             ];
         }
 

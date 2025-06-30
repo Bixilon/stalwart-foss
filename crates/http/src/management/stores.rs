@@ -236,7 +236,6 @@ impl ManageStore for Server {
                 }))
                 .into_http_response())
             }
-            // SPDX-SnippetEnd
             (Some("uids"), Some(account_id), None, &Method::DELETE) => {
                 let account_id = self
                     .core

@@ -270,9 +270,7 @@ impl ManageDirectory for Store {
         }
 
         let mut principal_create = Principal::new(0, principal_set.typ());
-
-        principal.set(PrincipalField::Name, name);
-
+        
 
         // Set fields
         principal_create.name = name;
@@ -2315,10 +2313,6 @@ pub fn not_found(value: impl Into<trc::Value>) -> trc::Error {
 
 pub fn unsupported(details: impl Into<trc::Value>) -> trc::Error {
     trc::ManageEvent::NotSupported.ctx(trc::Key::Details, details)
-}
-
-pub fn enterprise() -> trc::Error {
-    trc::ManageEvent::NotSupported.ctx(trc::Key::Details, "Enterprise feature")
 }
 
 pub fn error(details: impl Into<trc::Value>, reason: Option<impl Into<trc::Value>>) -> trc::Error {

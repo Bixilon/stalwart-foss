@@ -507,14 +507,6 @@ enum Response {
 }
 
 fn render_response(server: &Server, response: Response, language: &str) -> String {
-    #[cfg(feature = "enterprise")]
-    let template = server
-        .core
-        .enterprise
-        .as_ref()
-        .and_then(|e| e.template_scheduling_web.as_ref())
-        .unwrap_or(&server.core.groupware.itip_template);
-    #[cfg(not(feature = "enterprise"))]
     let template = &server.core.groupware.itip_template;
     let locale = i18n::locale_or_default(language);
 

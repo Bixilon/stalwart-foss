@@ -38,8 +38,6 @@ pub enum TelemetrySubscriberType {
     LogTracer(LogTracer),
     OtelTracer(OtelTracer),
     Webhook(WebhookTracer),
-    #[cfg(unix)]
-    JournalTracer(crate::telemetry::tracers::journald::Subscriber),
 }
 
 #[derive(Debug)]
@@ -392,43 +390,6 @@ impl Tracers {
                         }
                     }
                 }
-                "journal" => {
-                    #[cfg(unix)]
-                    {
-                        if !tracers
-                            .iter()
-                            .any(|t| matches!(t.typ, TelemetrySubscriberType::JournalTracer(_)))
-                        {
-                            match crate::telemetry::tracers::journald::Subscriber::new() {
-                                Ok(subscriber) => {
-                                    TelemetrySubscriberType::JournalTracer(subscriber)
-                                }
-                                Err(e) => {
-                                    config.new_build_error(
-                                        ("tracer", id, "type"),
-                                        format!("Failed to create journald subscriber: {e}"),
-                                    );
-                                    continue;
-                                }
-                            }
-                        } else {
-                            config.new_build_error(
-                                ("tracer", id, "type"),
-                                "Only one journal tracer is allowed".to_string(),
-                            );
-                            continue;
-                        }
-                    }
-
-                    #[cfg(not(unix))]
-                    {
-                        config.new_build_error(
-                            ("tracer", id, "type"),
-                            "Journald is only available on Unix systems.",
-                        );
-                        continue;
-                    }
-                }
                 unknown => {
                     config.new_parse_error(
                         ("tracer", id, "type"),
@@ -469,10 +430,6 @@ impl Tracers {
                 }
                 TelemetrySubscriberType::Webhook(_) => {
                     EventType::Telemetry(TelemetryEvent::WebhookError).into()
-                }
-                #[cfg(unix)]
-                TelemetrySubscriberType::JournalTracer(_) => {
-                    EventType::Telemetry(TelemetryEvent::JournalError).into()
                 }
             };
 

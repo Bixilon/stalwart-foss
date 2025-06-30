@@ -104,10 +104,6 @@ impl TelemetrySubscriberType {
             TelemetrySubscriberType::LogTracer(settings) => spawn_log_tracer(builder, settings),
             TelemetrySubscriberType::Webhook(settings) => spawn_webhook_tracer(builder, settings),
             TelemetrySubscriberType::OtelTracer(settings) => spawn_otel_tracer(builder, settings),
-            #[cfg(unix)]
-            TelemetrySubscriberType::JournalTracer(subscriber) => {
-                tracers::journald::spawn_journald_tracer(builder, subscriber)
-            }
         }
     }
 }

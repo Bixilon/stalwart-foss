@@ -5,7 +5,6 @@
  */
 
 #[cfg(unix)]
-pub mod journald;
 pub mod log;
 pub mod otel;
 pub mod stdout;

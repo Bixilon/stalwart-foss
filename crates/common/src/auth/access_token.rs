@@ -63,6 +63,8 @@ impl Server {
 
         // Apply principal permissions
         let mut permissions = role_permissions.finalize();
+        let mut tenant = None;
+
 
         // Build access token
         let mut access_token = AccessToken {

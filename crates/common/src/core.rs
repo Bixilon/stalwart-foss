@@ -706,7 +706,6 @@ impl Server {
             .caused_by(trc::location!())
     }
 
-    #[cfg(not(feature = "enterprise"))]
     pub async fn logo_resource(
         &self,
         _: &str,
